@@ -2,6 +2,8 @@ package util
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
@@ -15,12 +17,28 @@ func SearchUp(filename string) []string {
 	}
 
 	for {
-		if dir == ".git" {
-			files = append(files, fmt.Sprintf("%v", fileName))
+		if dir == "." {
 			break
 		}
-		files = append(files, fmt.Sprintf("%v/%v", dir, fileName))
+		current := fmt.Sprintf("%v/%v", dir, fileName)
+		if _, err := os.Stat(current); err == nil {
+			files = append(files, current)
+		}
+
 		dir = filepath.Dir(dir)
 	}
+	if _, err := os.Stat(fileName); err == nil {
+		return append(files, fileName)
+	}
 	return files
+}
+
+// Return the contents of the file at the given path as a string
+func ReadFileAsString(path string) (string, error) {
+	bytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bytes), nil
 }
