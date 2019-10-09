@@ -1,27 +1,24 @@
 package dude
 
 import (
-	"github.com/davecgh/go-spew/spew"
-	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/mattn/go-zglob"
+	"github.com/hashicorp/hcl/v2/hclsimple"
+	"github.com/mineiros-io/terradude/util"
+	"github.com/mineiros-io/terradude/config"
 	"log"
+	"os"
 )
 
 func RunFmt() error {
 
-	hclFiles, err := zglob.Glob("**/*.hcl")
-	if err != nil {
-		return err
-	}
+	files := util.SearchUp(os.Args[1])
 
-	parser := hclparse.NewParser()
+	var config config.Config
 
-	for _, v := range hclFiles {
-		hclParseTree, err := parser.ParseHCLFile(v)
-		if err != nil {
-			panic(err)
-		}
-		log.Println(spew.Sdump(hclParseTree))
+	for _, e := range files {
+
+		hclsimple.DecodeFile(e, nil, &config)
+
+		log.Printf("Configuration is %#v", config)
 	}
 
 	return nil
