@@ -23,3 +23,16 @@ globals {
   trusted_cidrs_vpn_1  = ["127.0.0.2/32"]
   trusted_cidrs_vpn_2  = ["127.0.0.3/32"]
 }
+
+define "provider-aws" {
+  provider "aws" {
+    version             = var.version
+    region              = global.aws_region
+    allowed_account_ids = var.allowed_account_ids
+
+    assume_role {
+      role_arn     = global.assume_role_arn
+      session_name = "terradude"
+    }
+  }
+}
