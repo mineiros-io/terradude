@@ -11,11 +11,10 @@ func RunFmt(file string) error {
 
 	files := util.SearchUp(file)
 
-	var config config.Config
+	for _, f := range files {
+		var config config.Config
 
-	for _, e := range files {
-
-		err := hclsimple.DecodeFile(e, nil, &config)
+		err := hclsimple.DecodeFile(f, nil, &config)
 		if err != nil {
 			panic(err)
 		}
@@ -24,5 +23,4 @@ func RunFmt(file string) error {
 	}
 
 	return nil
-
 }
