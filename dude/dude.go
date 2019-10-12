@@ -5,12 +5,11 @@ import (
 	"github.com/mineiros-io/terradude/util"
 	"github.com/mineiros-io/terradude/config"
 	"log"
-	"os"
 )
 
-func RunFmt() error {
+func RunFmt(file string) error {
 
-	files := util.SearchUp(os.Args[1])
+	files := util.SearchUp(file)
 
 	var config config.Config
 
