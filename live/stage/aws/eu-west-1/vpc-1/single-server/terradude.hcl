@@ -2,6 +2,10 @@ dependency "vpc" {
   path    = "../main-vpc"
 }
 
+dependency "vpc-peering" {
+  path    = "../vpc-peering"
+}
+
 terraform {
   module "single-server" {
     source  = "terraform-aws-modules/ec2-instance/aws"
