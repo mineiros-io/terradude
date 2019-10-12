@@ -15,7 +15,10 @@ func RunFmt(file string) error {
 
 	for _, e := range files {
 
-		hclsimple.DecodeFile(e, nil, &config)
+		err := hclsimple.DecodeFile(e, nil, &config)
+		if err != nil {
+			panic(err)
+		}
 
 		log.Printf("Configuration is %#v", config)
 	}
