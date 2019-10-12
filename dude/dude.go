@@ -19,6 +19,16 @@ func RunFmt(file string) error {
 			panic(err)
 		}
 
+		if f == file && config.Terraform == nil {
+			log.Fatalf("terraform block missing in leaf hcl file %s\n", f)
+			return nil
+		}
+
+		if f != file && config.Terraform != nil {
+			log.Fatalf("terraform block in non-leaf hcl file defined %s\n", f)
+			return nil
+		}
+
 		log.Printf("Configuration is %#v", config)
 	}
 
