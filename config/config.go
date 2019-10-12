@@ -28,21 +28,22 @@ type Terraform struct {
 
 type Dependency struct {
 	Name string `hcl:"name,label"`
+	Path string `hcl:"path,attr"`
   Remain hcl.Body `hcl:",remain"`
 }
 
 type Backend struct {
 	Name string `hcl:"name,label"`
-  Remain hcl.Body `hcl:",remain"`
+  Body hcl.Body `hcl:",remain"`
 }
 
 type Globals struct {
-  Remain hcl.Body `hcl:",remain"`
+  Body hcl.Body `hcl:",remain"`
 }
 
 type Define struct {
 	Name string `hcl:"name,label"`
-  Remain hcl.Body `hcl:",remain"`
+  Body hcl.Body `hcl:",remain"`
 }
 
 type Template struct {
