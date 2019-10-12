@@ -5,8 +5,8 @@ const DefaultConfigPath = "terradude.hcl"
 // represents a parsed config
 type Config struct {
 	Terradude *Terradude `hcl:"terradude,block"`
-	Backend   *Backend   `hcl:"backend"`
-	Globals   *Globals   `hcl:"globals"`
+	Backend   *Backend   `hcl:"backend,block"`
+	Globals   *Globals   `hcl:"globals,block"`
 }
 
 type Terradude struct {
