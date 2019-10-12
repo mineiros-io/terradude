@@ -27,8 +27,8 @@ globals {
 define "provider-aws" {
   provider "aws" {
     version             = var.version
-    region              = global.aws_region
     allowed_account_ids = var.allowed_account_ids
+    region              = global.aws_region
 
     assume_role {
       role_arn     = global.assume_role_arn
