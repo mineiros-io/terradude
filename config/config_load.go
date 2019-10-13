@@ -62,13 +62,13 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 		}
 
 		if config.Terradude != nil && config.Terradude.Version != "" {
+			log.Debug().Msgf("    found terradude.version in %s - stop including config files", file)
+
 			dir    := filepath.Dir(file)
 			rel, _ := filepath.Rel(dir, configFileName)
 
 			terradude["module_path"] = cty.StringVal(filepath.Dir(rel))
-
-			log.Debug().Msgf("    setting terradude.module_path = %#v", terradude["module_path"])
-			log.Debug().Msgf("    found terradude.version in %s - stop including config files", file)
+			log.Debug().Msgf("    setting terradude.module_path = %#v", terradude["module_path"].AsString())
 			break
 		}
 	}
