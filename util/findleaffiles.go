@@ -1,10 +1,10 @@
 package util
 
 import (
-	"fmt"
 	"strings"
 	"os"
 	"path/filepath"
+	"github.com/rs/zerolog/log"
 )
 
 func FindLeafFiles(search string, includes []string, excludes []string) ([]string, error) {
@@ -15,7 +15,7 @@ func FindLeafFiles(search string, includes []string, excludes []string) ([]strin
 	for _, dir := range includes {
 		err = filepath.Walk(dir, func (fullpath string, stat os.FileInfo, err error) error {
 			if err != nil {
-				fmt.Printf("%v: %v", fullpath, err)
+				log.Error().Msgf("%v: %v", fullpath, err)
 				return err
 			}
 			if stat.Name() == search {
@@ -30,6 +30,9 @@ func FindLeafFiles(search string, includes []string, excludes []string) ([]strin
 
 	outer: for _, check := range files {
 		dir := filepath.Dir(check)
+		if (dir == "." || dir == "/") && len(files) > 1 {
+			continue
+		}
 
 		// deduplicate - skip already detected leafs
 		for _, leaf := range leafs {

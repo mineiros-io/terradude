@@ -21,6 +21,10 @@ func main() {
 	leafs, _ := util.FindLeafFiles(config.DefaultConfigFileBaseName, os.Args[1:], nil)
 
 	for _, leaf := range leafs {
+		log.Debug().Msgf("found leaf in %s", leaf)
+	}
+
+	for _, leaf := range leafs {
 		dude.RunFmt(leaf)
 	}
 }
