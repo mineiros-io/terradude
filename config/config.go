@@ -4,9 +4,8 @@ import (
 	"github.com/hashicorp/hcl/v2"
 )
 
-const DefaultConfigPath = "terradude.hcl"
+const DefaultConfigFileBaseName = "terradude.hcl"
 
-// represents a parsed config
 type Config struct {
 	Terradude  *Terradude    `hcl:"terradude,block"`
 	Terraform  *Terraform    `hcl:"terraform,block"`
@@ -15,8 +14,6 @@ type Config struct {
 	Provider   []*Provider   `hcl:"provider,block"`
 	Globals    *Globals      `hcl:"globals,block"`
   Remain 		 hcl.Body      `hcl:",remain"`
-	// Define     *Define     `hcl:"define,block"`
-	// Template   *Template   `hcl:"template,block"`
 }
 
 type Terradude struct {
@@ -47,13 +44,3 @@ type Provider struct {
 type Globals struct {
   Body hcl.Body `hcl:",remain"`
 }
-
-// type Define struct {
-// 	Name string `hcl:"name,label"`
-//   Body hcl.Body `hcl:",remain"`
-// }
-//
-// type Template struct {
-// 	Name string `hcl:"name,label"`
-//   Body hcl.Body `hcl:",remain"`
-// }

@@ -13,7 +13,9 @@ backend "s3" {
 globals {
   team = "teamA"
 
-  aws_region = "eu-west-1"
+  aws_region = "us-east-1"
+
+  twenty = 5*4
 
   aws_account_id_teamA_env   = "12345678901"
   aws_account_id_teamB_prod  = "12345678902"
