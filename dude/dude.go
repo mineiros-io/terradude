@@ -2,6 +2,7 @@ package dude
 
 import (
 	"fmt"
+	"path/filepath"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/mineiros-io/terradude/config"
 	"github.com/rs/zerolog/log"
@@ -11,6 +12,7 @@ import (
 )
 
 func RunFmt(file string) error {
+	log.Info().Msgf("> start processing %v", filepath.Dir(file))
 
 	hclconfigs, diags := config.LoadConfigs(file)
 	if diags.HasErrors() {
@@ -37,6 +39,7 @@ func RunFmt(file string) error {
 	ctx.Variables["global"] = *globals
 	ctx.Variables["terradude"] = *globals
 
+	log.Info().Msgf("+ creating backend config for %s", filepath.Dir(file))
   f := hclwrite.NewEmptyFile()
   b := gohcl.EncodeAsBlock(backend, "backend")
 	attrs, _ := backend.Body.JustAttributes()
@@ -47,8 +50,8 @@ func RunFmt(file string) error {
 		}
 		b.Body().SetAttributeValue(attr.Name, val)
 	}
-
 	f.Body().AppendBlock(b)
 	fmt.Printf(string(f.Bytes()))
+	log.Info().Msgf("< finished processing %v", filepath.Dir(file))
 	return nil
 }
