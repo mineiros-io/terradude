@@ -6,7 +6,3 @@ provider "aws" {
 
 provider "random" {
 }
-
-globals {
-  environment = "stage"
-}
