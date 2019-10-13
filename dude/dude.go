@@ -1,55 +1,38 @@
 package dude
 
 import (
-	"github.com/hashicorp/hcl/v2/hclsimple"
-	"github.com/mineiros-io/terradude/util"
 	"github.com/mineiros-io/terradude/config"
-	"log"
+	"github.com/rs/zerolog/log"
 )
 
 func RunFmt(file string) error {
 
-	files := util.SearchUp(file)
+	hclconfigs, diags := config.LoadConfigs(file)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
+	}
 
-	for _, f := range files {
-		var config config.Config
-		log.Printf(" - %s\n", f)
+	terraform, diags := config.DecodeTerraformBlock(hclconfigs)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
+	}
 
-		err := hclsimple.DecodeFile(f, nil, &config)
-		if err != nil {
-			panic(err)
-		}
+	globals, diags := config.DecodeGlobalValues(hclconfigs)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
+	}
 
-		if f == file && config.Terraform == nil {
-			log.Fatalf("terraform block missing in leaf hcl file %s\n", f)
-			return nil
-		}
+	backend, diags := config.DecodeBackendBlock(hclconfigs, globals)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
+	}
 
-		if f != file && config.Terraform != nil {
-			log.Fatalf("terraform block in non-leaf hcl file defined %s\n", f)
-			return nil
-		}
-		if config.Terradude != nil {
-			log.Printf("     Terradude    = %#v", config.Terradude)
-		}
-		if config.Terraform != nil {
-			log.Printf("     Terraform    = %#v", config.Terraform)
-		}
-		if config.Backend != nil {
-			log.Printf("     Backend      = %#v", config.Backend)
-		}
-		for _, provider := range config.Provider {
-			log.Printf("     Provider     = %#v", provider)
-		}
-		for _, dependency := range config.Dependency {
-			log.Printf("     Dependency   = %#v", dependency)
-		}
-		if config.Globals != nil {
-			g,_ := config.Globals.Body.JustAttributes()
-			for _, attr := range g {
-				log.Printf("     Globals.%s = %#v", attr.Name, &attr.Expr)
-			}
-		}
+	log.Debug().Msgf("%#v", backend)
+	log.Debug().Msgf("%#v", terraform)
+
+	log.Printf("### Final globals")
+  for _, g := range globals {
+		log.Printf("  global.%s = %#v", g.Name, g.Value)
 	}
 
 	return nil

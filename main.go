@@ -2,7 +2,8 @@ package main
 
 import (
 	"os"
-	"log"
+  "github.com/rs/zerolog"
+  "github.com/rs/zerolog/log"
 	"github.com/mineiros-io/terradude/config"
 	"github.com/mineiros-io/terradude/util"
 	"github.com/mineiros-io/terradude/dude"
@@ -14,11 +15,13 @@ import (
 var VERSION string
 
 func main() {
-	leafs, _ := util.FindLeafFiles(config.DefaultConfigPath, os.Args[1:], nil)
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+
+	leafs, _ := util.FindLeafFiles(config.DefaultConfigFileBaseName, os.Args[1:], nil)
 
 	for _, leaf := range leafs {
-		log.Printf("start processing %v\n", leaf)
+		log.Info().Msgf("start processing %v", leaf)
 		dude.RunFmt(leaf)
-		log.Printf("finished processing %v\n", leaf)
+		log.Info().Msgf("finished processing %v", leaf)
 	}
 }
