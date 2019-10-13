@@ -3,8 +3,8 @@ terradude {
 }
 
 backend "s3" {
-  bucket          = "terraform-state-${terradude.local.path_elements[0]}"
-  key             = "${terradude.local.path}/terraform.tfstate"
+  bucket          = "terraform-state-${global.environment}"
+  key             = "${terradude.path}/terraform.tfstate"
   region          = "eu-west-1"
   dynamodb_table  = "terraform-locks"
   encrypt         = true
@@ -12,7 +12,7 @@ backend "s3" {
 
 globals {
   team = "teamA"
-
+  path = "abc"
   aws_region = "us-east-1"
 
   twenty = 5*4
