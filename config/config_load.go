@@ -66,9 +66,17 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 
 			dir    := filepath.Dir(file)
 			rel, _ := filepath.Rel(dir, configFileName)
+			abs, _ := filepath.Abs(dir)
+			mod    := filepath.Dir(rel)
 
-			terradude["module_path"] = cty.StringVal(filepath.Dir(rel))
-			log.Debug().Msgf("    setting terradude.module_path = %#v", terradude["module_path"].AsString())
+			terradude["module_path"]        = cty.StringVal(mod)
+			terradude["base_path"]          = cty.StringVal(dir)
+			terradude["absolute_base_path"] = cty.StringVal(abs)
+			terradude["terraform_path"]     = cty.StringVal(abs + "/.terradude/" + mod)
+			log.Debug().Msgf("    setting terradude.module_path        = %#v", terradude["module_path"].AsString())
+			log.Debug().Msgf("    setting terradude.base_path          = %#v", terradude["base_path"].AsString())
+			log.Debug().Msgf("    setting terradude.absolute_base_path = %#v", terradude["absolute_base_path"].AsString())
+			log.Debug().Msgf("    setting terradude.terraform_path     = %#v", terradude["terraform_path"].AsString())
 			break
 		}
 	}
