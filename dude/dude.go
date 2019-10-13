@@ -14,7 +14,7 @@ import (
 func RunFmt(file string) error {
 	log.Info().Msgf("> start processing %v", filepath.Dir(file))
 
-	hclconfigs, diags := config.LoadConfigs(file)
+	hclconfigs, terradude, diags := config.LoadConfigs(file)
 	if diags.HasErrors() {
 		log.Fatal().Msg(diags.Error())
 	}
@@ -37,7 +37,7 @@ func RunFmt(file string) error {
 	ctx := &hcl.EvalContext{}
 	ctx.Variables = map[string]cty.Value{}
 	ctx.Variables["global"] = *globals
-	ctx.Variables["terradude"] = *globals
+	ctx.Variables["terradude"] = *terradude
 
 	log.Info().Msgf("+ creating backend config for %s", filepath.Dir(file))
   f := hclwrite.NewEmptyFile()

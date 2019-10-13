@@ -37,15 +37,23 @@ func DecodeGlobalCty(hclconfigs []*Config) (*cty.Value, hcl.Diagnostics) {
 		}
 	}
 
-	ctyTypes := map[string]cty.Type{}
-	for key, value := range globals {
-		ctyTypes[key] = value.Type()
-	}
-	ctyObject := cty.Object(ctyTypes)
-	ctyGlobals, err := gocty.ToCtyValue(globals, ctyObject)
+	ctyGlobals, err := mapToCty(globals)
 	if err != nil {
 		return nil, err.(hcl.Diagnostics)
 	}
 
+	return ctyGlobals, nil
+}
+
+func mapToCty(theMap map[string]cty.Value) (*cty.Value, error) {
+	ctyTypes := map[string]cty.Type{}
+	for key, value := range theMap {
+		ctyTypes[key] = value.Type()
+	}
+	ctyObject := cty.Object(ctyTypes)
+	ctyGlobals, err := gocty.ToCtyValue(theMap, ctyObject)
+	if err != nil {
+		return nil, err
+	}
 	return &ctyGlobals, nil
 }

@@ -1,19 +1,22 @@
 package config
 
 import (
+	"path/filepath"
+	"github.com/zclconf/go-cty/cty"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/mineiros-io/terradude/util"
   "github.com/rs/zerolog/log"
 )
 
-func LoadConfigs(configFileName string) ([]*Config, hcl.Diagnostics) {
+func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics) {
 	var configs []*Config
 	var diags   hcl.Diagnostics
 	var file    string
 
-  backend := false
-	files   := util.SearchUp(configFileName, DefaultConfigFileBaseName)
+	files     := util.SearchUp(configFileName, DefaultConfigFileBaseName)
+	backend   := false
+	terradude := map[string]cty.Value{}
 
 	for _, file = range files {
 		var config Config
@@ -21,7 +24,7 @@ func LoadConfigs(configFileName string) ([]*Config, hcl.Diagnostics) {
 
 		err := hclsimple.DecodeFile(file, nil, &config)
 		if err != nil {
-			return nil, err.(hcl.Diagnostics)
+			return nil, nil, err.(hcl.Diagnostics)
 		}
 
 		if file == configFileName && config.Terraform == nil {
@@ -35,7 +38,7 @@ func LoadConfigs(configFileName string) ([]*Config, hcl.Diagnostics) {
 					End:      hcl.InitialPos,
 				},
 			})
-			return nil, diags
+			return nil, nil, diags
 		}
 
 		if file != configFileName && config.Terraform != nil {
@@ -49,7 +52,7 @@ func LoadConfigs(configFileName string) ([]*Config, hcl.Diagnostics) {
 					End:      hcl.InitialPos,
 				},
 			})
-			return nil, diags
+			return nil, nil, diags
 		}
 
 		configs = append(configs, &config)
@@ -59,6 +62,12 @@ func LoadConfigs(configFileName string) ([]*Config, hcl.Diagnostics) {
 		}
 
 		if config.Terradude != nil && config.Terradude.Version != "" {
+			dir    := filepath.Dir(file)
+			rel, _ := filepath.Rel(dir, configFileName)
+
+			terradude["module_path"] = cty.StringVal(filepath.Dir(rel))
+
+			log.Debug().Msgf("    setting terradude.module_path = %#v", terradude["module_path"])
 			log.Debug().Msgf("    found terradude.version in %s - stop including config files", file)
 			break
 		}
@@ -75,8 +84,13 @@ func LoadConfigs(configFileName string) ([]*Config, hcl.Diagnostics) {
 				End:      hcl.InitialPos,
 			},
 		})
-		return nil, diags
+		return nil, nil, diags
 	}
 
-	return configs, diags
+	ctyTerradude, err := mapToCty(terradude)
+	if err != nil {
+		return nil, nil, err.(hcl.Diagnostics)
+	}
+
+	return configs, ctyTerradude, diags
 }
