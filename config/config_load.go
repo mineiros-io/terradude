@@ -14,15 +14,22 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 	var diags   hcl.Diagnostics
 	var file    string
 
+	configFileName, _ = filepath.Abs(configFileName)
+
 	files     := util.SearchUp(configFileName, DefaultConfigFileBaseName)
 	backend   := false
 	terradude := map[string]cty.Value{}
 
 	for _, file = range files {
 		var config Config
-		log.Debug().Msgf("  including config %s", file)
+		abs, err := filepath.Abs(".")
+		rel, err := filepath.Rel(abs, file)
+		if err != nil {
+			panic(err)
+		}
+		log.Debug().Msgf("  including config %s", rel)
 
-		err := hclsimple.DecodeFile(file, nil, &config)
+		err = hclsimple.DecodeFile(file, nil, &config)
 		if err != nil {
 			return nil, nil, err.(hcl.Diagnostics)
 		}

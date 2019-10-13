@@ -9,17 +9,14 @@ import (
 func SearchUp(filePath string, baseName string) []string {
 	var files []string
 
-	dir := filePath
+	dir, _ := filepath.Abs(filePath)
 
 	if filepath.Base(filePath) == baseName {
 		dir = filepath.Dir(dir)
 	}
 
 	for {
-		if dir == "." || dir == "/" {
-			if _, err := os.Stat(baseName); err == nil {
-				return append(files, baseName)
-			}
+		if dir == "/" {
 			break
 		}
 		current := fmt.Sprintf("%v/%v", dir, baseName)
