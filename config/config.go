@@ -13,34 +13,34 @@ type Config struct {
 	Backend    *Backend      `hcl:"backend,block"`
 	Provider   []*Provider   `hcl:"provider,block"`
 	Globals    *Globals      `hcl:"globals,block"`
-  Remain 		 hcl.Body      `hcl:",remain"`
+	Remain     hcl.Body      `hcl:",remain"`
 }
 
 type Terradude struct {
 	Version string   `hcl:"version"`
-  Remain  hcl.Body `hcl:",remain"`
+	Remain  hcl.Body `hcl:",remain"`
 }
 
 type Terraform struct {
-  Remain hcl.Body `hcl:",remain"`
+	Remain hcl.Body `hcl:",remain"`
 }
 
 type Dependency struct {
 	Name   string   `hcl:"name,label"`
 	Path   string   `hcl:"path,attr"`
-  Remain hcl.Body `hcl:",remain"`
+	Remain hcl.Body `hcl:",remain"`
 }
 
 type Backend struct {
-	Name   string   `hcl:"name,label"`
-  Body   hcl.Body `hcl:",remain"`
+	Name string   `hcl:"name,label"`
+	Body hcl.Body `hcl:",remain"`
 }
 
 type BackendS3 struct {
-	Bucket             string   `hcl:"bucket"`
-	Key                string   `hcl:"key"`
-	Region             string   `hcl:"region"`
-	dynamodb_endpoint  *string  `hcl:"dynamodb_endpoint"`
+	Bucket            string  `hcl:"bucket"`
+	Key               string  `hcl:"key"`
+	Region            string  `hcl:"region"`
+	dynamodb_endpoint *string `hcl:"dynamodb_endpoint"`
 	// endpoint
 	// iam_endpoint
 	// sts_endpoint
@@ -71,12 +71,11 @@ type BackendS3 struct {
 	//
 }
 
-
 type Provider struct {
 	Name string   `hcl:"name,label"`
-  Body hcl.Body `hcl:",remain"`
+	Body hcl.Body `hcl:",remain"`
 }
 
 type Globals struct {
-  Body hcl.Body `hcl:",remain"`
+	Body hcl.Body `hcl:",remain"`
 }
