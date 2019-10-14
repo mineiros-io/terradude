@@ -1,9 +1,8 @@
-# this file will be created in every aws terradude module (subfolders)
-file "terradude-provider-aws.tf" {
-  source = "terradude-provider-aws.tf"
+provider "aws" {
+  version             = "~> 0.29"
+  allowed_account_ids = [ "0123456789" ]
+  region              = global.aws_region
 }
 
-globals {
-  aws_account_id = "0123456789"
-  environment    = "stage"
+provider "random" {
 }
