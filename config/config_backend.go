@@ -6,8 +6,7 @@ import (
 )
 
 func DecodeBackendBlock(hclconfigs []*Config, globals *cty.Value) (*Backend, hcl.Diagnostics) {
-	var diags   hcl.Diagnostics
-
+	var diags hcl.Diagnostics
 
 	for _, hclconfig := range hclconfigs {
 		if hclconfig.Backend != nil {

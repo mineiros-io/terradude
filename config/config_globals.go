@@ -6,14 +6,13 @@ import (
 	"github.com/hashicorp/hcl/v2"
 )
 
-
 type Global struct {
-	Name string
+	Name  string
 	Value cty.Value
 }
 
 func DecodeGlobalCty(hclconfigs []*Config) (*cty.Value, hcl.Diagnostics) {
-	var diags   hcl.Diagnostics
+	var diags hcl.Diagnostics
 	globals := map[string]cty.Value{}
 
 	for _, hclconfig := range hclconfigs {
@@ -24,7 +23,7 @@ func DecodeGlobalCty(hclconfigs []*Config) (*cty.Value, hcl.Diagnostics) {
 			}
 			diags = append(diags, diag...)
 			for _, attr := range attrs {
-				if _, ok := globals[attr.Name] ; ok {
+				if _, ok := globals[attr.Name]; ok {
 					continue
 				}
 				value, diag := attr.Expr.Value(nil)

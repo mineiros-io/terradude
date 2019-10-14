@@ -13,7 +13,7 @@ func FindLeafFiles(search string, includes []string, excludes []string) ([]strin
 	var err error
 
 	for _, dir := range includes {
-		err = filepath.Walk(dir, func (fullpath string, stat os.FileInfo, err error) error {
+		err = filepath.Walk(dir, func(fullpath string, stat os.FileInfo, err error) error {
 			if err != nil {
 				log.Error().Msgf("%v: %v", fullpath, err)
 				return err
@@ -28,30 +28,31 @@ func FindLeafFiles(search string, includes []string, excludes []string) ([]strin
 		}
 	}
 
-	outer: for _, check := range files {
-		dir := filepath.Dir(check)
-		if (dir == "." || dir == "/") && len(files) > 1 {
-			continue
-		}
-
-		// deduplicate - skip already detected leafs
-		for _, leaf := range leafs {
-			if leaf == check {
-				continue outer
-			}
-		}
-
-		for _, file := range files {
-			if file == check {
+	outer:
+		for _, check := range files {
+			dir := filepath.Dir(check)
+			if (dir == "." || dir == "/") && len(files) > 1 {
 				continue
 			}
-			if strings.HasPrefix(file, dir) {
-				continue outer
-			}
-	  }
 
-		leafs = append(leafs, check)
-	}
+			// deduplicate - skip already detected leafs
+			for _, leaf := range leafs {
+				if leaf == check {
+					continue outer
+				}
+			}
+
+			for _, file := range files {
+				if file == check {
+					continue
+				}
+				if strings.HasPrefix(file, dir) {
+					continue outer
+				}
+			}
+
+			leafs = append(leafs, check)
+		}
 
 	return leafs, nil
 }
