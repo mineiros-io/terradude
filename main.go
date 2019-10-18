@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/mineiros-io/terradude/cmd"
-	"github.com/mineiros-io/terradude/cli"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"os"
