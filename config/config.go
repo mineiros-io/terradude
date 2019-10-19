@@ -22,7 +22,13 @@ type Terradude struct {
 }
 
 type Terraform struct {
-  Remain hcl.Body `hcl:",remain"`
+	Module Module   `hcl:"module,block"`
+}
+
+type Module struct {
+	Name   string   `hcl:"name,label"`
+	Source string   `hcl:"source,attr"`
+	Body   hcl.Body `hcl:",remain"`
 }
 
 type Dependency struct {

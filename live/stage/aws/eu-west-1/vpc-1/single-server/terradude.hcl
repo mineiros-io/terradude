@@ -23,7 +23,7 @@ terraform {
     instance_type = "t2.small"
     ami           = "ami-ebd02392"
 
-    subnet_idsubnet_ids = dependency.vpc.outputs.public_subnets
+    subnet_idsubnet_ids = "dependency.vpc.outputs.public_subnets"
 
     tags = {
       Terradude = "true"
