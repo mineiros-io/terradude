@@ -19,10 +19,10 @@ func RunFmt(file string) error {
 		log.Fatal().Msg(diags.Error())
 	}
 
-	// terraform, diags := config.DecodeTerraformBlock(hclconfigs)
-	// if diags.HasErrors() {
-	// 	log.Fatal().Msg(diags.Error())
-	// }
+	terraform, diags := config.DecodeTerraformBlock(hclconfigs)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
+	}
 
 	globals, diags := config.DecodeGlobalCty(hclconfigs)
 	if diags.HasErrors() {
@@ -51,6 +51,18 @@ func RunFmt(file string) error {
 		b.Body().SetAttributeValue(attr.Name, val)
 	}
 	f.Body().AppendBlock(b)
+	log.Info().Msgf("+ creating module config for %s", filepath.Dir(file))
+	b = gohcl.EncodeAsBlock(terraform.Module, "module")
+	attrs, _ = terraform.Module.Body.JustAttributes()
+	for _,attr := range attrs {
+		val, err := attr.Expr.Value(ctx)
+		if err != nil {
+			panic(err)
+		}
+		b.Body().SetAttributeValue(attr.Name, val)
+	}
+	f.Body().AppendBlock(b)
+	log.Info().Msgf("= rendered config for %s", filepath.Dir(file))
 	fmt.Printf(string(f.Bytes()))
 	log.Info().Msgf("< finished processing %v", filepath.Dir(file))
 	return nil
