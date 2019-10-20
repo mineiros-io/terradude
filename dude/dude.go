@@ -1,7 +1,6 @@
 package dude
 
 import (
-	"fmt"
 	"os"
 	"io/ioutil"
 	"path/filepath"
@@ -70,7 +69,7 @@ func RunFmt(file string) error {
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-	fmt.Printf(string(f.Bytes()))
+	log.Info().Msgf("= saved config in %s", filepath.Dir(terradudeTF))
 	log.Info().Msgf("< finished processing %v", filepath.Dir(file))
 	return nil
 }
