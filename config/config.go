@@ -13,16 +13,16 @@ type Config struct {
 	Backend    *Backend      `hcl:"backend,block"`
 	Provider   []*Provider   `hcl:"provider,block"`
 	Globals    *Globals      `hcl:"globals,block"`
-  Remain 		 hcl.Body      `hcl:",remain"`
+	Remain     hcl.Body      `hcl:",remain"`
 }
 
 type Terradude struct {
 	Version string   `hcl:"version"`
-  Remain  hcl.Body `hcl:",remain"`
+	Remain  hcl.Body `hcl:",remain"`
 }
 
 type Terraform struct {
-	Module Module   `hcl:"module,block"`
+	Module Module `hcl:"module,block"`
 }
 
 type Module struct {
@@ -32,14 +32,14 @@ type Module struct {
 }
 
 type Dependency struct {
-	Name   string   `hcl:"name,label"`
-	Path   string   `hcl:"path,attr"`
-	Body   hcl.Body `hcl:",remain"`
+	Name string   `hcl:"name,label"`
+	Path string   `hcl:"path,attr"`
+	Body hcl.Body `hcl:",remain"`
 }
 
 type Backend struct {
-	Name   string   `hcl:"name,label"`
-	Body   hcl.Body `hcl:",remain"`
+	Name string   `hcl:"name,label"`
+	Body hcl.Body `hcl:",remain"`
 }
 
 type Provider struct {

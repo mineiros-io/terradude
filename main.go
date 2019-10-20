@@ -1,15 +1,14 @@
 package main
 
 import (
+	"github.com/mineiros-io/terradude/config"
+	"github.com/mineiros-io/terradude/dude"
+	"github.com/mineiros-io/terradude/util"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"os"
 	"time"
-  "github.com/rs/zerolog"
-  "github.com/rs/zerolog/log"
-	"github.com/mineiros-io/terradude/config"
-	"github.com/mineiros-io/terradude/util"
-	"github.com/mineiros-io/terradude/dude"
 )
-
 
 // This variable is set at build time using -ldflags parameters. For more info, see:
 // http://stackoverflow.com/a/11355611/483528
