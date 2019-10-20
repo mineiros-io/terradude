@@ -2,6 +2,8 @@ package dude
 
 import (
 	"fmt"
+	"os"
+	"io/ioutil"
 	"path/filepath"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/mineiros-io/terradude/config"
@@ -57,6 +59,17 @@ func RunFmt(file string) error {
 	f.Body().AppendNewline()
 	f.Body().AppendBlock(terraform)
 	log.Info().Msgf("= rendered config for %s", filepath.Dir(file))
+
+  config := terradude.AsValueMap()
+	err := os.MkdirAll(config["terraform_path"].AsString(), 0755)
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
+	terradudeTF := config["terraform_path"].AsString() + "/terradude.tf"
+  err = ioutil.WriteFile(terradudeTF, f.Bytes(), 0644)
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
 	fmt.Printf(string(f.Bytes()))
 	log.Info().Msgf("< finished processing %v", filepath.Dir(file))
 	return nil
