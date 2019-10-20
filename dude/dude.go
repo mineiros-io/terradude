@@ -7,6 +7,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/mineiros-io/terradude/config"
 	"github.com/rs/zerolog/log"
+	tflang "github.com/hashicorp/terraform/lang"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
@@ -19,12 +20,18 @@ func RunFmt(file string) error {
 		log.Fatal().Msg(diags.Error())
 	}
 
-	globals, diags := config.DecodeGlobalCty(hclconfigs)
+	tfscope := tflang.Scope{
+		BaseDir: filepath.Dir(file),
+	}
+
+	ctx := &hcl.EvalContext{}
+	ctx.Functions = tfscope.Functions()
+
+	globals, diags := config.DecodeGlobalCty(hclconfigs, ctx)
 	if diags.HasErrors() {
 		log.Fatal().Msg(diags.Error())
 	}
 
-	ctx := &hcl.EvalContext{}
 	ctx.Variables = map[string]cty.Value{}
 	ctx.Variables["global"] = *globals
 	ctx.Variables["terradude"] = *terradude
