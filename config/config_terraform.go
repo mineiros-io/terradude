@@ -1,10 +1,11 @@
 package config
 
 import (
-	"github.com/rs/zerolog/log"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/rs/zerolog/log"
+	"sort"
 )
 
 func DecodeTerraformBlock(configs []*Config, ctx *hcl.EvalContext) (*hclwrite.Block, hcl.Diagnostics) {
@@ -22,12 +23,18 @@ func DecodeTerraformBlock(configs []*Config, ctx *hcl.EvalContext) (*hclwrite.Bl
 	if diags.HasErrors() {
 		log.Fatal().Msg(diags.Error())
 	}
-	for _,attr := range attrs {
-		val, err := attr.Expr.Value(ctx)
+
+	var keys []string
+	for a := range attrs {
+		keys = append(keys, a)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		val, err := attrs[k].Expr.Value(ctx)
 		if err != nil {
 			return nil, err
 		}
-		block.Body().SetAttributeValue(attr.Name, val)
+		block.Body().SetAttributeValue(attrs[k].Name, val)
 	}
 
 	return block, diags
