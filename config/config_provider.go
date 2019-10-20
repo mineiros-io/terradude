@@ -24,7 +24,6 @@ func DecodeProviderBlocks(configs []*Config, ctx *hcl.EvalContext) ([]*hclwrite.
 				log.Warn().Msgf("ignoring provider %s (redefined)", id)
 				continue
 			}
-			log.Debug().Msgf("provider: %s", id)
 			providers[id] = provider
 		}
 	}
