@@ -7,7 +7,6 @@ import (
 	"github.com/mineiros-io/terradude/config"
 	"github.com/rs/zerolog/log"
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 )
 
@@ -19,17 +18,7 @@ func RunFmt(file string) error {
 		log.Fatal().Msg(diags.Error())
 	}
 
-	terraform, diags := config.DecodeTerraformBlock(hclconfigs)
-	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
-	}
-
 	globals, diags := config.DecodeGlobalCty(hclconfigs)
-	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
-	}
-
-	backend, diags := config.DecodeBackendBlock(hclconfigs, globals)
 	if diags.HasErrors() {
 		log.Fatal().Msg(diags.Error())
 	}
@@ -39,29 +28,34 @@ func RunFmt(file string) error {
 	ctx.Variables["global"] = *globals
 	ctx.Variables["terradude"] = *terradude
 
-	log.Info().Msgf("+ creating backend config for %s", filepath.Dir(file))
-  f := hclwrite.NewEmptyFile()
-  b := gohcl.EncodeAsBlock(backend, "backend")
-	attrs, _ := backend.Body.JustAttributes()
-	for _,attr := range attrs {
-		val, err := attr.Expr.Value(ctx)
-		if err != nil {
-			panic(err)
-		}
-		b.Body().SetAttributeValue(attr.Name, val)
+	backend, diags := config.DecodeBackendBlock(hclconfigs, ctx)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
 	}
-	f.Body().AppendBlock(b)
-	log.Info().Msgf("+ creating module config for %s", filepath.Dir(file))
-	b = gohcl.EncodeAsBlock(terraform.Module, "module")
-	attrs, _ = terraform.Module.Body.JustAttributes()
-	for _,attr := range attrs {
-		val, err := attr.Expr.Value(ctx)
-		if err != nil {
-			panic(err)
-		}
-		b.Body().SetAttributeValue(attr.Name, val)
+
+	terraform, diags := config.DecodeTerraformBlock(hclconfigs, ctx)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
 	}
-	f.Body().AppendBlock(b)
+
+	providers, diags := config.DecodeProviderBlocks(hclconfigs, ctx)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
+	}
+
+
+	f := hclwrite.NewEmptyFile()
+
+	log.Info().Msgf("+ appending backend config for %s", filepath.Dir(file))
+	f.Body().AppendBlock(backend)
+	log.Info().Msgf("+ appending provider config for %s", filepath.Dir(file))
+	for _, provider := range providers {
+		f.Body().AppendNewline()
+		f.Body().AppendBlock(provider)
+	}
+	log.Info().Msgf("+ appending terraform config for %s", filepath.Dir(file))
+	f.Body().AppendNewline()
+	f.Body().AppendBlock(terraform)
 	log.Info().Msgf("= rendered config for %s", filepath.Dir(file))
 	fmt.Printf(string(f.Bytes()))
 	log.Info().Msgf("< finished processing %v", filepath.Dir(file))
