@@ -1,8 +1,5 @@
 provider "aws" {
-  version             = "~> 0.29"
-  allowed_account_ids = [ "0123456789" ]
+  version             = "~> 2.7"
+  allowed_account_ids = [ global.aws_account_id ]
   region              = global.aws_region
-}
-
-provider "random" {
 }
