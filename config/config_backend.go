@@ -31,6 +31,8 @@ func DecodeBackendBlock(hclconfigs []*Config, ctx *hcl.EvalContext) (*hclwrite.B
 		}
 		block.Body().SetAttributeValue(attr.Name, val)
 	}
+	tfblock := hclwrite.NewBlock("terraform", nil)
+	tfblock.Body().AppendBlock(block)
 
-	return block, diags
+	return tfblock, diags
 }
