@@ -21,10 +21,11 @@ terraform {
       cidrsubnet(global.cidr, 8, 103)
     ]
 
-    tags = {
-      Terradude = "true"
-      Terraform = "true"
-      Environment = global.environment
-    }
+    tags = merge(
+      global.default_tags,
+      {
+        AWSAccount = global.aws_account_id
+      }
+    )
   }
 }

@@ -25,16 +25,16 @@ func RunFmt(file string) error {
 	}
 
 	ctx := &hcl.EvalContext{}
+	ctx.Variables = map[string]cty.Value{}
 	ctx.Functions = tfscope.Functions()
+	ctx.Variables["terradude"] = *terradude
 
 	globals, diags := config.DecodeGlobalCty(hclconfigs, ctx)
 	if diags.HasErrors() {
 		log.Fatal().Msg(diags.Error())
 	}
 
-	ctx.Variables = map[string]cty.Value{}
 	ctx.Variables["global"] = *globals
-	ctx.Variables["terradude"] = *terradude
 
 	backend, diags := config.DecodeBackendBlock(hclconfigs, ctx)
 	if diags.HasErrors() {

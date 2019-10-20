@@ -56,8 +56,8 @@ globals {
   ]
 }
 ```
-Globals do not allow variable interpolation of any kind
-but supports function interpolation.
+The `globals` block supports functions and variable interpolation for
+the `terradude` namespace.
 
 ### `terraform {}`
 ```
