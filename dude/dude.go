@@ -44,7 +44,6 @@ func RunFmt(file string) error {
 		log.Fatal().Msg(diags.Error())
 	}
 
-
 	f := hclwrite.NewEmptyFile()
 
 	log.Info().Msgf("+ appending backend config for %s", filepath.Dir(file))
@@ -59,13 +58,14 @@ func RunFmt(file string) error {
 	f.Body().AppendBlock(terraform)
 	log.Info().Msgf("= rendered config for %s", filepath.Dir(file))
 
-  config := terradude.AsValueMap()
+	config := terradude.AsValueMap()
 	err := os.MkdirAll(config["terraform_path"].AsString(), 0755)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
+
 	terradudeTF := config["terraform_path"].AsString() + "/terradude.tf"
-  err = ioutil.WriteFile(terradudeTF, f.Bytes(), 0644)
+	err = ioutil.WriteFile(terradudeTF, f.Bytes(), 0644)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
