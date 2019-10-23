@@ -8,7 +8,7 @@ terradude {
   version = "~> 0.1"
 }
 ```
-The `terradude` block does not support variable interpolation of any kind.
+The `terradude` block does not support interpolation of any kind.
 
 #### Attributes
 - `version` (required, top-level config) Version constraint for terradude
@@ -37,6 +37,8 @@ provider "aws" {
   allowed_account_ids = [ global.aws_account_id ]
 }
 ```
+The `provider` blocks support functions and variable interpolation for
+the `global` and `terradude` namespaces.
 The `provider` block can be defined in any level of terradude config.
 Multiple definitions of the same provider will not (yet) be merged but cause error.
 
@@ -47,9 +49,15 @@ globals {
   aws_account_id  = "0123456789"
   environment     = "production"
   cidr_block      = "10.10.0.0/16"
+  subnet_cidrs    = [
+    cidrsubnet("10.10.0.0/16", 8, 1),
+    cidrsubnet("10.10.0.0/16", 8, 2),
+    cidrsubnet("10.10.0.0/16", 8, 3)
+  ]
 }
 ```
-Globals do not allow variable interpolation of any kind
+The `globals` block supports functions and variable interpolation for
+the `terradude` namespace.
 
 ### `terraform {}`
 ```
@@ -62,8 +70,8 @@ terraform {
 }
 ```
 The `terraform` block can only be defined in leaf level `terradude.hcl` files
-The `terraform` block allows variable interpolation of `global`, `dependency`
-and `terradude` namespaces.
+The `terraform` block allows functions and variable interpolation of
+`global`, `dependency` and `terradude` namespaces.
 
 ### `dependency "name" {}`
 ```

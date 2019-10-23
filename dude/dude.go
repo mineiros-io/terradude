@@ -1,14 +1,15 @@
 package dude
 
 import (
-	"fmt"
-	"path/filepath"
-	"github.com/zclconf/go-cty/cty"
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclwrite"
+	tflang "github.com/hashicorp/terraform/lang"
 	"github.com/mineiros-io/terradude/config"
 	"github.com/rs/zerolog/log"
-	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclwrite"
+	"github.com/zclconf/go-cty/cty"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 func RunFmt(file string) error {
@@ -19,51 +20,63 @@ func RunFmt(file string) error {
 		log.Fatal().Msg(diags.Error())
 	}
 
-	terraform, diags := config.DecodeTerraformBlock(hclconfigs)
-	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
-	}
-
-	globals, diags := config.DecodeGlobalCty(hclconfigs)
-	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
-	}
-
-	backend, diags := config.DecodeBackendBlock(hclconfigs, globals)
-	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
+	tfscope := tflang.Scope{
+		BaseDir: filepath.Dir(file),
 	}
 
 	ctx := &hcl.EvalContext{}
 	ctx.Variables = map[string]cty.Value{}
-	ctx.Variables["global"] = *globals
+	ctx.Functions = tfscope.Functions()
 	ctx.Variables["terradude"] = *terradude
 
-	log.Info().Msgf("+ creating backend config for %s", filepath.Dir(file))
-  f := hclwrite.NewEmptyFile()
-  b := gohcl.EncodeAsBlock(backend, "backend")
-	attrs, _ := backend.Body.JustAttributes()
-	for _,attr := range attrs {
-		val, err := attr.Expr.Value(ctx)
-		if err != nil {
-			panic(err)
-		}
-		b.Body().SetAttributeValue(attr.Name, val)
+	globals, diags := config.DecodeGlobalCty(hclconfigs, ctx)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
 	}
-	f.Body().AppendBlock(b)
-	log.Info().Msgf("+ creating module config for %s", filepath.Dir(file))
-	b = gohcl.EncodeAsBlock(terraform.Module, "module")
-	attrs, _ = terraform.Module.Body.JustAttributes()
-	for _,attr := range attrs {
-		val, err := attr.Expr.Value(ctx)
-		if err != nil {
-			panic(err)
-		}
-		b.Body().SetAttributeValue(attr.Name, val)
+
+	ctx.Variables["global"] = *globals
+
+	backend, diags := config.DecodeBackendBlock(hclconfigs, ctx)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
 	}
-	f.Body().AppendBlock(b)
+
+	terraform, diags := config.DecodeTerraformBlock(hclconfigs, ctx)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
+	}
+
+	providers, diags := config.DecodeProviderBlocks(hclconfigs, ctx)
+	if diags.HasErrors() {
+		log.Fatal().Msg(diags.Error())
+	}
+
+	f := hclwrite.NewEmptyFile()
+
+	log.Info().Msgf("+ appending backend config for %s", filepath.Dir(file))
+	f.Body().AppendBlock(backend)
+	log.Info().Msgf("+ appending provider config for %s", filepath.Dir(file))
+	for _, provider := range providers {
+		f.Body().AppendNewline()
+		f.Body().AppendBlock(provider)
+	}
+	log.Info().Msgf("+ appending terraform config for %s", filepath.Dir(file))
+	f.Body().AppendNewline()
+	f.Body().AppendBlock(terraform)
 	log.Info().Msgf("= rendered config for %s", filepath.Dir(file))
-	fmt.Printf(string(f.Bytes()))
+
+	config := terradude.AsValueMap()
+	err := os.MkdirAll(config["terraform_path"].AsString(), 0755)
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
+
+	terradudeTF := config["terraform_path"].AsString() + "/terradude.tf"
+	err = ioutil.WriteFile(terradudeTF, f.Bytes(), 0644)
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
+	log.Info().Msgf("= saved config in %s", filepath.Dir(terradudeTF))
 	log.Info().Msgf("< finished processing %v", filepath.Dir(file))
 	return nil
 }

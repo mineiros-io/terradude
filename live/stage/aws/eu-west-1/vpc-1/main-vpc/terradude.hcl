@@ -1,18 +1,31 @@
+globals {
+  cidr = "10.0.0.0/16"
+}
+
 terraform {
   module "vpc" {
     source = "terraform-aws-modules/vpc/aws"
 
-    name = "main-vpc"
-    cidr = "10.0.0.0/16"
+    name   = "main-vpc"
+    cidr   = global.cidr
 
-    azs             = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
-    private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-    public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+    azs = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+    private_subnets = [
+      cidrsubnet(global.cidr, 8, 1),
+      cidrsubnet(global.cidr, 8, 2),
+      cidrsubnet(global.cidr, 8, 3)
+    ]
+    public_subnets  = [
+      cidrsubnet(global.cidr, 8, 101),
+      cidrsubnet(global.cidr, 8, 102),
+      cidrsubnet(global.cidr, 8, 103)
+    ]
 
-    tags = {
-      Terradude = "true"
-      Terraform = "true"
-      Environment = global.environment
-    }
+    tags = merge(
+      global.default_tags,
+      {
+        AWSAccount = global.aws_account_id
+      }
+    )
   }
 }
