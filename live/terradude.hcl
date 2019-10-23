@@ -25,3 +25,12 @@ globals {
   trusted_cidrs_vpn_1  = ["127.0.0.2/32"]
   trusted_cidrs_vpn_2  = ["127.0.0.3/32"]
 }
+
+modules {
+
+  stage {
+    account_id: 123456
+  }
+
+
+}

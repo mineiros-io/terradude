@@ -12,7 +12,7 @@ var listCmd = &cobra.Command{
 	Short: "List all found terraform modules",
 	Long:  `Searches the given path backwards recursively for terradude.hcl files`,
 	Run: func(cmd *cobra.Command, args []string) {
-		leafs, _ := util.FindLeafFiles(config.DefaultConfigFileBaseName, args[0:], nil)
+		leafs, _ := util.RecursiveBackwardsWalk(config.DefaultConfigFileBaseName, args[0:], nil)
 
 		for _, leaf := range leafs {
 			log.Debug().Msgf("found leaf in %s", leaf)
