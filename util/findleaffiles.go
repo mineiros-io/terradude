@@ -1,10 +1,10 @@
 package util
 
 import (
-	"strings"
+	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
-	"github.com/rs/zerolog/log"
+	"strings"
 )
 
 func FindLeafFiles(search string, includes []string, excludes []string) ([]string, error) {
@@ -13,7 +13,7 @@ func FindLeafFiles(search string, includes []string, excludes []string) ([]strin
 	var err error
 
 	for _, dir := range includes {
-		err = filepath.Walk(dir, func (fullpath string, stat os.FileInfo, err error) error {
+		err = filepath.Walk(dir, func(fullpath string, stat os.FileInfo, err error) error {
 			if err != nil {
 				log.Error().Msgf("%v: %v", fullpath, err)
 				return err
@@ -28,7 +28,8 @@ func FindLeafFiles(search string, includes []string, excludes []string) ([]strin
 		}
 	}
 
-	outer: for _, check := range files {
+outer:
+	for _, check := range files {
 		dir := filepath.Dir(check)
 		if (dir == "." || dir == "/") && len(files) > 1 {
 			continue
@@ -48,7 +49,7 @@ func FindLeafFiles(search string, includes []string, excludes []string) ([]strin
 			if strings.HasPrefix(file, dir) {
 				continue outer
 			}
-	  }
+		}
 
 		leafs = append(leafs, check)
 	}
