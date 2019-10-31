@@ -13,7 +13,7 @@ import (
 )
 
 func RunFmt(file string) error {
-	log.Info().
+	log.Debug().
 		Str("module", filepath.Dir(file)).
 		Msg("processing module")
 
@@ -75,23 +75,23 @@ func RunFmt(file string) error {
 
 	f := hclwrite.NewEmptyFile()
 
-	log.Info().
+	log.Debug().
 		Str("module", filepath.Dir(file)).
 		Msg("appending backend config")
 	f.Body().AppendBlock(backend)
-	log.Info().
+	log.Debug().
 		Str("module", filepath.Dir(file)).
 		Msg("appending provider config")
 	for _, provider := range providers {
 		f.Body().AppendNewline()
 		f.Body().AppendBlock(provider)
 	}
-	log.Info().
+	log.Debug().
 		Str("module", filepath.Dir(file)).
 		Msg("appending terraform module config")
 	f.Body().AppendNewline()
 	f.Body().AppendBlock(terraform)
-	log.Info().
+	log.Debug().
 		Str("module", filepath.Dir(file)).
 		Msg("completed rendering config")
 
