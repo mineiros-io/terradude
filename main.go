@@ -18,11 +18,11 @@ var VERSION string
 var (
 	app       = kingpin.New("terradude", "A thin wrapper for terraform.")
 	debug     = app.Flag("debug", "Enable debug mode.").Bool()
+	jsonlog   = app.Flag("jsonlog", "Enable JSON logging.").Bool()
 	directory = app.Arg("directory", "Directory to run in.").Default(".").String()
 )
 
 func main() {
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
 	kingpin.Version("0.0.1")
 	app.Parse(os.Args[1:])
 
@@ -31,6 +31,11 @@ func main() {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
+	if *jsonlog {
+		zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	} else {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
+	}
 
 	leafs, _ := util.FindLeafFiles(config.DefaultConfigFileBaseName, []string{*directory}, nil)
 
