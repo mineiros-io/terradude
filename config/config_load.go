@@ -28,8 +28,8 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 			panic(err)
 		}
 		log.Debug().
-			Str("path", rel).
-			Msgf("including config")
+			Str("file", rel).
+			Msg("including config")
 
 		err = hclsimple.DecodeFile(file, nil, &config)
 		if err != nil {
@@ -72,7 +72,7 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 
 		if config.Terradude != nil && config.Terradude.Version != "" {
 			log.Debug().
-				Str("path", file).
+				Str("file", file).
 				Str("version", config.Terradude.Version).
 				Msgf("found terradude.version - stop including more config files")
 
