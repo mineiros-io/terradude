@@ -27,7 +27,9 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 		if err != nil {
 			panic(err)
 		}
-		log.Debug().Msgf("  including config %s", rel)
+		log.Debug().
+			Str("file", rel).
+			Msg("including config")
 
 		err = hclsimple.DecodeFile(file, nil, &config)
 		if err != nil {
@@ -69,7 +71,10 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 		}
 
 		if config.Terradude != nil && config.Terradude.Version != "" {
-			log.Debug().Msgf("    found terradude.version in %s - stop including config files", file)
+			log.Debug().
+				Str("file", file).
+				Str("version", config.Terradude.Version).
+				Msgf("found terradude.version - stop including more config files")
 
 			dir := filepath.Dir(file)
 			rel, _ := filepath.Rel(dir, configFileName)
@@ -79,9 +84,18 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 			terradude["module_path"] = cty.StringVal(mod)
 			terradude["base_path"] = cty.StringVal(dir)
 			terradude["terraform_path"] = cty.StringVal(abs + "/.terradude/" + mod)
-			log.Debug().Msgf("    setting terradude.module_path        = %#v", terradude["module_path"].AsString())
-			log.Debug().Msgf("    setting terradude.base_path          = %#v", terradude["base_path"].AsString())
-			log.Debug().Msgf("    setting terradude.terraform_path     = %#v", terradude["terraform_path"].AsString())
+			log.Debug().
+				Str("key", "terradude.module_path").
+				Str("value", terradude["module_path"].AsString()).
+				Msg("setting variable")
+			log.Debug().
+				Str("key", "terradude.base_path").
+				Str("value", terradude["base_path"].AsString()).
+				Msg("setting variable")
+			log.Debug().
+				Str("key", "terradude.terraform_path").
+				Str("value", terradude["terraform_path"].AsString()).
+				Msg("setting variable")
 			break
 		}
 	}

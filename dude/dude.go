@@ -13,11 +13,17 @@ import (
 )
 
 func RunFmt(file string) error {
-	log.Info().Msgf("> start processing %v", filepath.Dir(file))
+	log.Debug().
+		Str("directory", filepath.Dir(file)).
+		Msg("processing directory")
 
 	hclconfigs, terradude, diags := config.LoadConfigs(file)
 	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
+		log.Fatal().
+			Str("file", file).
+			Str("module", filepath.Dir(file)).
+			Err(diags).
+			Msg("could not load config file")
 	}
 
 	tfscope := tflang.Scope{
@@ -31,52 +37,86 @@ func RunFmt(file string) error {
 
 	globals, diags := config.DecodeGlobalCty(hclconfigs, ctx)
 	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
+		log.Fatal().
+			Str("file", file).
+			Str("directory", filepath.Dir(file)).
+			Err(diags).
+			Msg("could not decode globals block")
 	}
 
 	ctx.Variables["global"] = *globals
 
 	backend, diags := config.DecodeBackendBlock(hclconfigs, ctx)
 	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
+		log.Fatal().
+			Str("file", file).
+			Str("directory", filepath.Dir(file)).
+			Err(diags).
+			Msg("could not decode backend block")
 	}
 
 	terraform, diags := config.DecodeTerraformBlock(hclconfigs, ctx)
 	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
+		log.Fatal().
+			Str("file", file).
+			Str("directory", filepath.Dir(file)).
+			Err(diags).
+			Msg("could not decode terraform block")
 	}
 
 	providers, diags := config.DecodeProviderBlocks(hclconfigs, ctx)
 	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
+		log.Fatal().
+			Str("file", file).
+			Str("directory", filepath.Dir(file)).
+			Err(diags).
+			Msg("could not provider blocks")
 	}
 
 	f := hclwrite.NewEmptyFile()
 
-	log.Info().Msgf("+ appending backend config for %s", filepath.Dir(file))
+	log.Debug().
+		Str("directory", filepath.Dir(file)).
+		Msg("appending backend config")
 	f.Body().AppendBlock(backend)
-	log.Info().Msgf("+ appending provider config for %s", filepath.Dir(file))
+	log.Debug().
+		Str("directory", filepath.Dir(file)).
+		Msg("appending provider config")
 	for _, provider := range providers {
 		f.Body().AppendNewline()
 		f.Body().AppendBlock(provider)
 	}
-	log.Info().Msgf("+ appending terraform config for %s", filepath.Dir(file))
+	log.Debug().
+		Str("directory", filepath.Dir(file)).
+		Msg("appending terraform module config")
 	f.Body().AppendNewline()
 	f.Body().AppendBlock(terraform)
-	log.Info().Msgf("= rendered config for %s", filepath.Dir(file))
+	log.Debug().
+		Str("directory", filepath.Dir(file)).
+		Msg("completed rendering config")
 
 	config := terradude.AsValueMap()
 	err := os.MkdirAll(config["terraform_path"].AsString(), 0755)
 	if err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().
+			Str("directory", filepath.Dir(file)).
+			Str("file", config["terraform_path"].AsString()).
+			Err(err).
+			Msg("could not create directory structure")
 	}
 
 	terradudeTF := config["terraform_path"].AsString() + "/terradude.tf"
 	err = ioutil.WriteFile(terradudeTF, f.Bytes(), 0644)
 	if err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().
+			Str("directory", filepath.Dir(file)).
+			Str("file", config["terraform_path"].AsString()+"/terradude.tf").
+			Err(err).
+			Msg("could not create terraform file")
 	}
-	log.Info().Msgf("= saved config in %s", filepath.Dir(terradudeTF))
-	log.Info().Msgf("< finished processing %v", filepath.Dir(file))
+	log.Info().
+		Str("directory", filepath.Dir(file)).
+		Str("file", config["terraform_path"].AsString()+"/terradude.tf").
+		Msg("created terraform file")
 	return nil
 }
