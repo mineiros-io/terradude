@@ -26,14 +26,12 @@ type Terraform struct {
 }
 
 type Module struct {
-	Name   string   `hcl:"name,label"`
-	Source string   `hcl:"source,attr"`
-	Body   hcl.Body `hcl:",remain"`
+	Name string   `hcl:"name,label"`
+	Body hcl.Body `hcl:",remain"`
 }
 
 type Dependency struct {
 	Name string   `hcl:"name,label"`
-	Path string   `hcl:"path,attr"`
 	Body hcl.Body `hcl:",remain"`
 }
 
