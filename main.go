@@ -40,7 +40,9 @@ func main() {
 	leafs, _ := util.FindLeafFiles(config.DefaultConfigFileBaseName, []string{*directory}, nil)
 
 	for _, leaf := range leafs {
-		log.Debug().Msgf("found leaf in %s", leaf)
+		log.Debug().
+			Str("file", leaf).
+			Msg("found leaf config")
 	}
 
 	for _, leaf := range leafs {
