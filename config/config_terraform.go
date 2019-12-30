@@ -15,7 +15,8 @@ func DecodeTerraformBlock(configs []*Config, ctx *hcl.EvalContext) ([]*hclwrite.
 	var blocks []*hclwrite.Block
 
 	if configs[0] == nil || configs[0].Terraform == nil {
-		log.Fatal().Msg("terraform block not defined in leaf")
+		log.Fatal().
+			Msg("terraform block not defined in leaf")
 	}
 
 	terraform = configs[0].Terraform
@@ -23,7 +24,8 @@ func DecodeTerraformBlock(configs []*Config, ctx *hcl.EvalContext) ([]*hclwrite.
 	block := gohcl.EncodeAsBlock(terraform.Module, "module")
 	attrs, diags := terraform.Module.Body.JustAttributes()
 	if diags.HasErrors() {
-		log.Fatal().Msg(diags.Error())
+		log.Fatal().
+			Msg(diags.Error())
 	}
 
 	var keys []string
