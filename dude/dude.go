@@ -86,11 +86,13 @@ func RunFmt(file string) error {
 		f.Body().AppendNewline()
 		f.Body().AppendBlock(provider)
 	}
-	log.Debug().
-		Str("directory", filepath.Dir(file)).
-		Msg("appending terraform module config")
-	f.Body().AppendNewline()
-	f.Body().AppendBlock(terraform)
+	for _, block := range terraform {
+		log.Debug().
+			Str("directory", filepath.Dir(file)).
+			Msg("appending terraform block config")
+		f.Body().AppendNewline()
+		f.Body().AppendBlock(block)
+	}
 	log.Debug().
 		Str("directory", filepath.Dir(file)).
 		Msg("completed rendering config")
