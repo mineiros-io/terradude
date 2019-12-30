@@ -31,9 +31,13 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 			Str("file", rel).
 			Msg("including config")
 
-		err = hclsimple.DecodeFile(file, nil, &config)
-		if err != nil {
-			return nil, nil, err.(hcl.Diagnostics)
+		d := hclsimple.DecodeFile(file, nil, &config)
+		if d != nil {
+			for _, e := range d.(hcl.Diagnostics) {
+				log.Error().
+					Msg(e.Error())
+			}
+			return nil, nil, d.(hcl.Diagnostics)
 		}
 
 		if file == configFileName && config.Terraform == nil {
