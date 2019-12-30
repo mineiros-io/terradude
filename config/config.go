@@ -22,10 +22,16 @@ type Terradude struct {
 }
 
 type Terraform struct {
-	Module Module `hcl:"module,block"`
+	Module Module    `hcl:"module,block"`
+	Output []*Output `hcl:"output,block"`
 }
 
 type Module struct {
+	Name string   `hcl:"name,label"`
+	Body hcl.Body `hcl:",remain"`
+}
+
+type Output struct {
 	Name string   `hcl:"name,label"`
 	Body hcl.Body `hcl:",remain"`
 }
