@@ -2,12 +2,19 @@
 version = "0.1.0"
 
 terraform {
-  module "single-server" {
-    source = "${terradude.base_path}/../modules/ec2/modules/single-server/"
+  module "random_pet" {
+    source = "${terradude.base_path}/../modules/random"
 
-    parameter = [""]
-    vpc_id = "local.terradude.dependency.vpc.outputs.vpc_id"
-    region = global.aws_region
+    random = [
+      { name = "a", data = "aa" },
+      { name = "b.b", data = "bb" },
+      { name = "c", data = "ccxx" },
+      { name = "d", data = "dd" },
+    ]
+  }
+
+  output "random_pet" {
+    value       = module.random_pet
   }
 }
 
