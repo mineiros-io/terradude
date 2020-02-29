@@ -1,12 +1,13 @@
 package config
 
 import (
+	"path/filepath"
+
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/mineiros-io/terradude/util"
 	"github.com/rs/zerolog/log"
 	"github.com/zclconf/go-cty/cty"
-	"path/filepath"
 )
 
 func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics) {
@@ -22,7 +23,7 @@ func LoadConfigs(configFileName string) ([]*Config, *cty.Value, hcl.Diagnostics)
 
 	for _, file = range files {
 		var config Config
-		abs, err := filepath.Abs(".")
+		abs, _ := filepath.Abs(".")
 		rel, err := filepath.Rel(abs, file)
 		if err != nil {
 			panic(err)

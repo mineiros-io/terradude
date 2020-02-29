@@ -1,10 +1,11 @@
 package util
 
 import (
-	"github.com/rs/zerolog/log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/rs/zerolog/log"
 )
 
 func FindLeafFiles(search string, includes []string, excludes []string) ([]string, error) {

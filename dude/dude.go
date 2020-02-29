@@ -1,15 +1,16 @@
 package dude
 
 import (
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	tflang "github.com/hashicorp/terraform/lang"
 	"github.com/mineiros-io/terradude/config"
 	"github.com/rs/zerolog/log"
 	"github.com/zclconf/go-cty/cty"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 func RunFmt(file string) error {
