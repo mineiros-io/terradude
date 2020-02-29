@@ -32,8 +32,8 @@ The `backend` block can be defined only once and should be defined in the top-le
 ### `provider "name" {}`
 ```
 provider "aws" {
-  version = "~> 0.29"
-  region  = global.aws_region
+  version             = "~> 0.29"
+  region              = global.aws_region
   allowed_account_ids = [ global.aws_account_id ]
 }
 ```
@@ -49,22 +49,22 @@ globals {
   aws_account_id  = "0123456789"
   environment     = "production"
   cidr_block      = "10.10.0.0/16"
-  subnet_cidrs    = [
-    cidrsubnet("10.10.0.0/16", 8, 1),
-    cidrsubnet("10.10.0.0/16", 8, 2),
-    cidrsubnet("10.10.0.0/16", 8, 3)
+  subnet_cidrs = [
+    cidrsubnet(global.cidr_block, 8, 1),
+    cidrsubnet(global.cidr_block, 8, 2),
+    cidrsubnet(global.cidr_block, 8, 3)
   ]
 }
 ```
-The `globals` block supports functions and variable interpolation for
-the `terradude` namespace.
+The `globals` block supports functions and variable interpolation of
+`global` and `terradude` namespaces.
 
 ### `terraform {}`
 ```
 terraform {
   module "ec2" {
-    source     = "github.com/terradude/terraform-modules//ec2"
-    version    = "0.1"
+    source     = "mineiros-io/ec2-instance/aws"
+    version    = "0.1.0"
     subnet_ids = dependency.vpc.private_subnet_ids
   }
 }
@@ -75,7 +75,7 @@ The `terraform` block allows functions and variable interpolation of
 
 ### `dependency "name" {}`
 ```
-dependency {
+dependency "vpc" {
   path = "../vpc"
 }
 ```

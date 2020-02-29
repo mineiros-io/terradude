@@ -6,7 +6,7 @@ terraform {
     source = "${terradude.base_path}/../modules/random"
 
     random = [
-      { name = "a", data = "aa" },
+      { name = "a", data = global.environment },
       { name = "b.b", data = "bb" },
       { name = "c", data = "ccxx" },
       { name = "d", data = "dd" },

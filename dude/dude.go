@@ -35,16 +35,20 @@ func RunFmt(file string) error {
 	ctx.Functions = tfscope.Functions()
 	ctx.Variables["terradude"] = *terradude
 
-	globals, diags := config.DecodeGlobalCty(hclconfigs, ctx)
-	if diags.HasErrors() {
-		log.Fatal().
-			Str("file", file).
-			Str("directory", filepath.Dir(file)).
-			Err(diags).
-			Msg("could not decode globals block")
+	lastfailed := 0
+	for cont := true; cont; {
+		globals, failed, diags := config.DecodeGlobalCty(hclconfigs, ctx)
+		ctx.Variables["global"] = *globals
+		cont = (failed > 0 && failed != lastfailed)
+		lastfailed = failed
+		if !cont && diags.HasErrors() {
+			log.Fatal().
+				Str("file", file).
+				Str("directory", filepath.Dir(file)).
+				Err(diags).
+				Msg("could not decode globals block")
+		}
 	}
-
-	ctx.Variables["global"] = *globals
 
 	backend, diags := config.DecodeBackendBlock(hclconfigs, ctx)
 	if diags.HasErrors() {

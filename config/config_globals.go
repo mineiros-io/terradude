@@ -11,15 +11,16 @@ type Global struct {
 	Value cty.Value
 }
 
-func DecodeGlobalCty(hclconfigs []*Config, ctx *hcl.EvalContext) (*cty.Value, hcl.Diagnostics) {
+func DecodeGlobalCty(hclconfigs []*Config, ctx *hcl.EvalContext) (*cty.Value, int, hcl.Diagnostics) {
 	var diags hcl.Diagnostics
 	globals := map[string]cty.Value{}
+	failed := 0
 
 	for _, hclconfig := range hclconfigs {
 		if hclconfig.Globals != nil {
 			attrs, diag := hclconfig.Globals.Body.JustAttributes()
 			if diag.HasErrors() {
-				return nil, diags
+				return nil, 0, diags
 			}
 			diags = append(diags, diag...)
 			for _, attr := range attrs {
@@ -29,7 +30,8 @@ func DecodeGlobalCty(hclconfigs []*Config, ctx *hcl.EvalContext) (*cty.Value, hc
 				value, diag := attr.Expr.Value(ctx)
 				diags = append(diags, diag...)
 				if diag.HasErrors() {
-					return nil, diags
+					failed++
+					continue
 				}
 				globals[attr.Name] = value
 			}
@@ -38,10 +40,14 @@ func DecodeGlobalCty(hclconfigs []*Config, ctx *hcl.EvalContext) (*cty.Value, hc
 
 	ctyGlobals, err := mapToCty(globals)
 	if err != nil {
-		return nil, err.(hcl.Diagnostics)
+		return nil, 0, err.(hcl.Diagnostics)
 	}
 
-	return ctyGlobals, nil
+	if failed > 0 {
+		return ctyGlobals, failed, diags
+	}
+
+	return ctyGlobals, 0, nil
 }
 
 func mapToCty(theMap map[string]cty.Value) (*cty.Value, error) {
