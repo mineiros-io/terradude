@@ -14,11 +14,13 @@ backend "local" {
 }
 
 globals {
+  environment = split("/", terradude.module_path)[0]
+
   default_tags = {
     Terradude       = "true"
     TerradudeModule = terradude.module_path
     Terraform       = "true"
-    Environment     = split("/", terradude.module_path)[0]
+    Environment     = global.environment
   }
 
   aws_region = "us-east-1"
@@ -27,7 +29,7 @@ globals {
       stage      = "12345678901"
       production = "12345678902"
     },
-    split("/", terradude.module_path)[0],
+    global.environment,
     "none"
   )
 }
