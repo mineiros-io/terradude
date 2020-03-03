@@ -1,11 +1,12 @@
 package config
 
 import (
+	"sort"
+
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclwrite"
 	"github.com/rs/zerolog/log"
-	"sort"
 )
 
 func DecodeProviderBlocks(configs []*Config, ctx *hcl.EvalContext) ([]*hclwrite.Block, hcl.Diagnostics) {
