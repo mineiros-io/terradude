@@ -25,7 +25,7 @@ var (
 
 func main() {
 	kingpin.Version("0.0.1")
-	//app.Parse(os.Args[1:])
+	app.Parse(os.Args[1:])
 
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	if *debug {
